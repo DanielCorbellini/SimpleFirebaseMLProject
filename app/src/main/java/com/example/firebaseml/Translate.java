@@ -6,7 +6,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.google.mlkit.nl.translate.TranslateLanguage;
 import com.google.mlkit.nl.translate.Translator;
 import com.google.mlkit.nl.translate.TranslatorOptions;
 import com.google.mlkit.nl.translate.Translation;
@@ -17,15 +16,18 @@ public class Translate {
     private Context context;
 
     // Construtor: receber o Context (pra poder usar Toast)
-    public Translate(Context context) {
+    public Translate(Context context, String sourceLang, String targetLang) {
         this.context = context;
-        setupTranslator();
+        setupTranslator(sourceLang, targetLang);
     }
 
-    private void setupTranslator() {
+    public Translate(TranslateActivity context) {
+    }
+
+    private void setupTranslator(String sourceLang, String targetLang) {
         TranslatorOptions options = new TranslatorOptions.Builder()
-                .setSourceLanguage(TranslateLanguage.PORTUGUESE) // ORIGEM
-                .setTargetLanguage(TranslateLanguage.ENGLISH)    // DESTINO
+                .setSourceLanguage(sourceLang)
+                .setTargetLanguage(targetLang)
                 .build();
 
         translator = Translation.getClient(options);
@@ -42,10 +44,16 @@ public class Translate {
 
     // Nova função que realmente traduz texto
     public void translateText(@NonNull String text, @NonNull TranslateCallback callback) {
-        translator.translate(text)
-                .addOnSuccessListener(callback::onSuccess)
+        translator.downloadModelIfNeeded()
+                .addOnSuccessListener(unused -> {
+                    // Só depois que o modelo estiver pronto, a gente traduz
+                    translator.translate(text)
+                            .addOnSuccessListener(callback::onSuccess)
+                            .addOnFailureListener(callback::onFailure);
+                })
                 .addOnFailureListener(callback::onFailure);
     }
+
 
     // Interface para callback
     public interface TranslateCallback {

@@ -38,9 +38,12 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.vision.common)
+    implementation(libs.play.services.mlkit.face.detection)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation("com.google.mlkit:translate:17.0.3")
+    implementation(libs.translate)
     implementation(platform(libs.firebase.bom))
+    implementation (libs.firebase.ml.modeldownloader)
 }
